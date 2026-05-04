@@ -9,13 +9,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // ADD THIS BLOCK
   server: {
+    // ✅ Proxy all /api requests to Node/Express server on port 4000
     proxy: {
       '/api': {
-        target: 'http://localhost:4000',
+        target: 'http://127.0.0.1:4000',
         changeOrigin: true,
-        secure: false,
+        secure: false, // allow self-signed certs if using HTTPS
       }
     }
   }

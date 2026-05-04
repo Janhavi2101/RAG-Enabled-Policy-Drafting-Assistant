@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Bot, User, FileCog, MessagesSquare, Download, Save, FileText, Check, AlertCircle } from 'lucide-react';
+import { Send, Bot, User, FileCog, MessagesSquare, Download, Save, FileText, Check, AlertCircle, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PolicyActionsPanel } from '@/components/policy-actions-panel';
 import ReactMarkdown from "react-markdown";
+import { buildPolicyPdf } from "@/components/policy-pdf-document";
+import { useNavigate } from 'react-router-dom';
 
 // --- Chat Component ---
 const ChatMessage = ({ role, content }) => (
@@ -34,6 +36,7 @@ const ChatMessage = ({ role, content }) => (
 );
 
 const Editor = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('chat');
   const [messages, setMessages] = useState([
     { role: 'assistant', content: 'I am the Drafting Agent. Tell me what policy you need (e.g., "Draft a policy for clinical establishment registration in India").' }
@@ -43,26 +46,38 @@ const Editor = () => {
   const messagesEndRef = useRef(null);
   const [documentContent, setDocumentContent] = useState("# New Policy Document\n\nGenerated content will appear here...");
   const [saveStatus, setSaveStatus] = useState("idle"); // idle, saving, saved, error
+  const [exportStatus, setExportStatus] = useState("idle"); // idle, exporting, error
 
   // --- BUTTON LOGIC ---
 
-  // 1. Export Logic (Download as .md file)
-  const handleExport = () => {
+  // 1. Export Logic (Download as .pdf file)
+  const handleExport = async () => {
     if (!documentContent) return;
-    const element = document.createElement("a");
-    const file = new Blob([documentContent], {type: 'text/markdown'});
-    element.href = URL.createObjectURL(file);
-    element.download = `policy_draft_${Date.now()}.md`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    setExportStatus("exporting");
+
+    try {
+      const { blob, fileName } = await buildPolicyPdf(documentContent);
+      const downloadUrl = URL.createObjectURL(blob);
+      const element = document.createElement("a");
+      element.href = downloadUrl;
+      element.download = fileName;
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+      URL.revokeObjectURL(downloadUrl);
+      setExportStatus("idle");
+    } catch (error) {
+      console.error("PDF export failed", error);
+      setExportStatus("error");
+      setTimeout(() => setExportStatus("idle"), 3000);
+    }
   };
 
   // 2. Save Logic (To MongoDB via /save-draft)
   const handleSave = async () => {
     setSaveStatus("saving");
     try {
-        const response = await fetch('http://127.0.0.1:5000/save-draft', {
+        const response = await fetch('http://127.0.0.1:5001/save-draft', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
@@ -95,15 +110,18 @@ const Editor = () => {
 
     try {
         // Send request to the Drafting route
-        const response = await fetch('http://127.0.0.1:5000/draft', {
+        const response = await fetch('/api/draft', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: currentInput })
+            body: JSON.stringify({
+              query: currentInput,
+              current_content: documentContent
+            })
         });
 
         const data = await response.json();
         
-        if (data.response) {
+        if (data.message) {
             const aiMsg = { 
                 role: 'assistant', 
                 content: "I have drafted the policy based on legal requirements. You can see the full text in the preview panel on the right." 
@@ -111,7 +129,7 @@ const Editor = () => {
             setMessages(prev => [...prev, aiMsg]);
             
             // INJECT THE GENERATED TEXT INTO THE EDITOR
-            setDocumentContent(data.response); 
+            setDocumentContent(data.message); 
         } else {
             throw new Error("Empty response from AI");
         }
@@ -197,11 +215,23 @@ const Editor = () => {
             </div>
             
             <div className="flex gap-2">
-               <button 
+              <button 
                  onClick={handleExport}
+                 disabled={exportStatus === 'exporting'}
                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground bg-card border border-border rounded-md hover:bg-muted transition-colors"
                >
-                <Download size={14} /> Export (.md)
+                <Download size={14} />
+                {exportStatus === 'exporting' ? "Exporting PDF..." :
+                 exportStatus === 'error' ? "Export Failed" :
+                 "Export (.pdf)"}
+              </button>
+
+              <button
+                onClick={() => navigate('/check-draft')}
+                className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-muted-foreground bg-card border border-border rounded-md hover:bg-muted transition-colors"
+              >
+                <ShieldCheck size={14} />
+                Check Draft
               </button>
               
               <button 

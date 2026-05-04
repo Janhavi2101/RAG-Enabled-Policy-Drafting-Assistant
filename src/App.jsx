@@ -3,6 +3,7 @@ import { ThemeProvider } from "./components/theme-provider" // Import this
 import Navbar from './components/Navbar';
 import { ChatInterface } from './components/chat-interface';
 import Editor from './pages/Editor';
+import CheckDraftPage from './pages/CheckDraftPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <Routes>
               <Route path="/" element={<ChatInterface />} />
               <Route path="/draft" element={<Editor />} />
+              <Route path="/check-draft" element={<CheckDraftPage />} />
             </Routes>
           </div>
         </div>

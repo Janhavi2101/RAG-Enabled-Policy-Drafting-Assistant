@@ -24,3 +24,24 @@ dist-ssr
 *.sw?
 /server/.env
 /ai-engine/models
+# Python virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Mac files
+.DS_Store
+
+# Knowledge base large/generated files
+ai-engine/kb/_backup_original/
+ai-engine/kb/new_pdfs/
+ai-engine/kb/**/*.pdf
+ai-engine/kb/**/*_chunks.json
+
+# Saved ML models
+ai-engine/saved_models/

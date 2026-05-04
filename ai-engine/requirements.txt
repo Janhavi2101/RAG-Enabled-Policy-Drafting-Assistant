@@ -3,8 +3,15 @@ flask-cors
 langchain
 langchain-community
 langchain-huggingface
+langchain-ollama
+langchain-text-splitters
 faiss-cpu
+numpy
+pymupdf
+pdfplumber
 pypdf
+PyPDF2
 pymongo
 python-dotenv
 sentence-transformers
+torch
