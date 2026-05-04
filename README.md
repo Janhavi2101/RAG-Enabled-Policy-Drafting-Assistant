@@ -81,12 +81,25 @@ pnpm dev
 ## Visuals
 
 ### 1st Phase UI Interface
+<img src="public/chat.png" alt="Chat interface" width="100%"/>
 
-<img src="public/rag.png" alt="FONet Architecture" width="100%"/>
+### Policy Drafting Interface
+<img src="public/drafter.png" alt="Drafting Agent" width="100%"/>
+
+### Sample Drafted Policy Snippet
+<img src="public/drafted1.png" alt="policy drafted sample" width="100%"/>
+<img src="public/drafted2.png" alt="policy drafted sample" width="100%"/>
+
+### Policy Validation and Anomaly Checking
+
+<img src="public/validation1.png" alt="validation of policy" width="100%"/>
+<img src="public/validation2.png" alt="validation of policy" width="100%"/>
+
+
 
 ---
 
 ## Contact and Links
-**Anurag Gaonkar** - [GitHub](https://github.com/AnuragGaonkar) | [LinkedIn](https://www.linkedin.com/in/anurag-gaonkar-68a463261)
+**Janhavi Gangawane** - [GitHub](https://github.com/Janhavi2101) | [LinkedIn](https://www.linkedin.com/in/janhavi-gangawane-tsec/)
 
-Project Link: [https://github.com/AnuragGaonkar/RAG-Enabled-Policy-Drafting-Assistant](https://github.com/AnuragGaonkar/RAG-Enabled-Policy-Drafting-Assistant)
+Project Link: [https://github.com/Janhavi2101/RAG-Enabled-Policy-Drafting-Assistant](https://github.com/Janhavi2101/RAG-Enabled-Policy-Drafting-Assistant)
